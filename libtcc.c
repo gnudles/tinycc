@@ -26,7 +26,9 @@
 #include "tccpp.c"
 #include "tccgen.c"
 #include "tccdbg.c"
+#ifndef TCC_TARGET_1750A
 #include "tccasm.c"
+#endif
 #include "tccelf.c"
 #include "tccrun.c"
 #ifdef TCC_TARGET_I386
@@ -53,6 +55,11 @@
 #include "riscv64-gen.c"
 #include "riscv64-link.c"
 #include "riscv64-asm.c"
+#elif defined(TCC_TARGET_1750A)
+#include "1750a-gen.c"
+#include "1750a-link.c"
+#include "1750a-asm.c"
+#include "tcccoff.c"
 #else
 #error unknown target
 #endif

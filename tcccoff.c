@@ -23,6 +23,7 @@
 
 /* XXX: this file uses tcc_error() to the effect of exit(1) */
 #undef _tcc_error
+#define tcc_error _tcc_error_noabort
 
 #define MAXNSCNS 255		/* MAXIMUM NUMBER OF SECTIONS         */
 #define MAX_STR_TABLE 1000000
@@ -97,18 +98,27 @@ ST_FUNC int tcc_output_coff(TCCState *s1, FILE *f)
     nb_syms = symtab_section->data_offset / sizeof(Elf32_Sym);
     coff_nb_syms = FindCoffSymbolIndex(s1, "XXXXXXXXXX1");
 
+#ifdef TCC_TARGET_1750A
+    file_hdr.f_magic = COFF_1750A_MAGIC;
+    file_hdr.f_TargetID = 0; /* Not needed for 1750A */
+#else
     file_hdr.f_magic = COFF_C67_MAGIC;	/* magic number */
+    file_hdr.f_TargetID = 0x99;	/* for C6x = 0x0099 */
+#endif
     file_hdr.f_timdat = 0;	/* time & date stamp */
     file_hdr.f_opthdr = sizeof(AOUTHDR);	/* sizeof(optional hdr) */
     file_hdr.f_flags = 0x1143;	/* flags (copied from what code composer does) */
-    file_hdr.f_TargetID = 0x99;	/* for C6x = 0x0099 */
 
     o_filehdr.magic = 0x0108;	/* see magic.h                          */
     o_filehdr.vstamp = 0x0190;	/* version stamp                        */
     o_filehdr.tsize = stext->data_offset;	/* text size in bytes, padded to FW bdry */
     o_filehdr.dsize = sdata->data_offset;	/* initialized data "  "                */
     o_filehdr.bsize = sbss->data_offset;	/* uninitialized data "   "             */
+#ifdef TCC_TARGET_1750A
+    o_filehdr.entrypt = 0;	/* entry pt.                          */
+#else
     o_filehdr.entrypt = C67_main_entry_point;	/* entry pt.                          */
+#endif
     o_filehdr.text_start = stext->sh_addr;	/* base of text used for this file      */
     o_filehdr.data_start = sdata->sh_addr;	/* base of data used for this file      */
 

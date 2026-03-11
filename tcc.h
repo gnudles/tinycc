@@ -149,11 +149,13 @@ extern long double strtold (const char *__nptr, char **__endptr);
 /* #define TCC_TARGET_ARM64  *//* ARMv8 code generator */
 /* #define TCC_TARGET_C67    *//* TMS320C67xx code generator */
 /* #define TCC_TARGET_RISCV64 *//* risc-v code generator */
+/* #define TCC_TARGET_1750A  *//* MIL-STD-1750A code generator */
 
 /* default target is I386 */
 #if !defined(TCC_TARGET_I386) && !defined(TCC_TARGET_ARM) && \
     !defined(TCC_TARGET_ARM64) && !defined(TCC_TARGET_C67) && \
-    !defined(TCC_TARGET_X86_64) && !defined(TCC_TARGET_RISCV64)
+    !defined(TCC_TARGET_X86_64) && !defined(TCC_TARGET_RISCV64) && \
+    !defined(TCC_TARGET_1750A)
 # if defined __x86_64__
 #  define TCC_TARGET_X86_64
 # elif defined __arm__
@@ -395,6 +397,11 @@ extern long double strtold (const char *__nptr, char **__endptr);
 # include "riscv64-gen.c"
 # include "riscv64-link.c"
 # include "riscv64-asm.c"
+#elif defined(TCC_TARGET_1750A)
+# define TCC_TARGET_COFF
+# include "coff.h"
+# include "1750a-gen.c"
+# include "1750a-link.c"
 #else
 #error unknown target
 #endif
@@ -423,6 +430,10 @@ extern long double strtold (const char *__nptr, char **__endptr);
 
 #if PTR_SIZE == 8 && !defined TCC_TARGET_PE
 # define LONG_SIZE 8
+#elif PTR_SIZE == 2
+# define LONG_SIZE 4
+#elif PTR_SIZE == 1
+# define LONG_SIZE 2
 #else
 # define LONG_SIZE 4
 #endif
@@ -1456,7 +1467,7 @@ ST_FUNC ElfSym *elfsym(Sym *);
 ST_FUNC void update_storage(Sym *sym);
 ST_FUNC void put_extern_sym2(Sym *sym, int sh_num, addr_t value, unsigned long size, int can_add_underscore);
 ST_FUNC void put_extern_sym(Sym *sym, Section *section, addr_t value, unsigned long size);
-#if PTR_SIZE == 4
+#if PTR_SIZE == 4 || PTR_SIZE == 2 || PTR_SIZE == 1
 ST_FUNC void greloc(Section *s, Sym *sym, unsigned long offset, int type);
 #endif
 ST_FUNC void greloca(Section *s, Sym *sym, unsigned long offset, int type, addr_t addend);
@@ -1486,7 +1497,7 @@ ST_FUNC void vrott(int n);
 ST_FUNC void vrotb(int n);
 ST_FUNC void vrev(int n);
 ST_FUNC void vpop(void);
-#if PTR_SIZE == 4
+#if PTR_SIZE == 4 || PTR_SIZE == 2 || PTR_SIZE == 1
 ST_FUNC void lexpand(void);
 #endif
 #ifdef TCC_TARGET_ARM
