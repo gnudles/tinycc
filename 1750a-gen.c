@@ -499,7 +499,15 @@ void gen_opi(int op)
             g(0x1C00 | (r << 4) | fr); /* M Rr, Rfr */
             break;
         case '/':
+            /* Divide 32-bit (R, R+1) by 16-bit (fr). Quotient in R, Remainder in R+1. */
             g(0x1D00 | (r << 4) | fr); /* D Rr, Rfr */
+            break;
+        case '%':
+        case TOK_UMOD:
+            /* Divide 32-bit (R, R+1) by 16-bit (fr). Quotient in R, Remainder in R+1. */
+            g(0x1D00 | (r << 4) | fr); /* D Rr, Rfr */
+            /* Move remainder to destination register */
+            g(0x1800 | (r << 4) | (r + 1)); /* LR R, R+1 */
             break;
         case '&':
             g(0x1E00 | (r << 4) | fr); /* N Rr, Rfr (AND) */
