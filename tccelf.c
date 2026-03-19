@@ -1771,6 +1771,8 @@ ST_FUNC void tccelf_add_crtbegin(TCCState *s1)
         tcc_add_crt(s1, "crtbegin_so.o");
     else
         tcc_add_crt(s1, "crtbegin_dynamic.o");
+#elif defined TCC_TARGET_1750A
+    /* Bare metal target */
 #else
     if (s1->output_type != TCC_OUTPUT_DLL)
         tcc_add_crt(s1, "crt1.o");
@@ -1796,6 +1798,8 @@ ST_FUNC void tccelf_add_crtend(TCCState *s1)
         tcc_add_crt(s1, "crtend_so.o");
     else
         tcc_add_crt(s1, "crtend_android.o");
+#elif defined TCC_TARGET_1750A
+    /* Bare metal target */
 #else
     tcc_add_crt(s1, "crtn.o");
 #endif
@@ -1838,7 +1842,9 @@ ST_FUNC void tcc_add_runtime(TCCState *s1)
 #endif
         if (lpthread)
             tcc_add_library(s1, "pthread");
+#ifndef TCC_TARGET_1750A
         tcc_add_library(s1, "c");
+#endif
 #ifdef TCC_LIBGCC
         if (!s1->static_link) {
             if (TCC_LIBGCC[0] == '/')
@@ -1850,11 +1856,13 @@ ST_FUNC void tcc_add_runtime(TCCState *s1)
 #if defined TCC_TARGET_ARM && TARGETOS_FreeBSD
         tcc_add_library(s1, "gcc_s"); // unwind code
 #endif
+#ifndef TCC_TARGET_1750A
         if (TCC_LIBTCC1[0])
             tcc_add_support(s1, TCC_LIBTCC1);
 #ifndef TCC_TARGET_MACHO
         if (s1->output_type != TCC_OUTPUT_MEMORY)
             tccelf_add_crtend(s1);
+#endif
 #endif
     }
 }
