@@ -182,33 +182,33 @@ void load(int r, SValue * sv)
         } else if (v == VT_LOCAL) {
             /* Load from frame pointer + offset. R14 is FP */
             if ((ft & VT_BTYPE) == VT_BYTE) {
-                g(0x4000 | (r << 4) | 14); /* LB Rr, fc, R14 */
+                g(0x0000 | (r << 4) | 14); /* LB Rr, fc, R14 */
                 g(fc);
             } else if ((ft & VT_BTYPE) == VT_DOUBLE || (ft & VT_BTYPE) == VT_LDOUBLE) {
-                g(0x5000 | (r << 4) | 14); g(fc);     /* L Rr, fc, R14 */
-                g(0x5000 | ((r+1) << 4) | 14); g(fc+1); /* L Rr+1, fc+1, R14 */
-                g(0x5000 | ((r+2) << 4) | 14); g(fc+2); /* L Rr+2, fc+2, R14 */
+                g(0x8000 | (r << 4) | 14); g(fc);     /* L Rr, fc, R14 */
+                g(0x8000 | ((r+1) << 4) | 14); g(fc+1); /* L Rr+1, fc+1, R14 */
+                g(0x8000 | ((r+2) << 4) | 14); g(fc+2); /* L Rr+2, fc+2, R14 */
             } else if ((ft & VT_BTYPE) == VT_FLOAT || (ft & VT_BTYPE) == VT_LONG || (ft & VT_BTYPE) == VT_LLONG) {
-                g(0x5000 | (r << 4) | 14); g(fc);     /* L Rr, fc, R14 */
-                g(0x5000 | ((r+1) << 4) | 14); g(fc+1); /* L Rr+1, fc+1, R14 */
+                g(0x8000 | (r << 4) | 14); g(fc);     /* L Rr, fc, R14 */
+                g(0x8000 | ((r+1) << 4) | 14); g(fc+1); /* L Rr+1, fc+1, R14 */
             } else {
-                g(0x5000 | (r << 4) | 14); /* L Rr, fc, R14 */
+                g(0x8000 | (r << 4) | 14); /* L Rr, fc, R14 */
                 g(fc);
             }
         } else if (v < VT_CONST) {
             /* indirect load */
             if ((ft & VT_BTYPE) == VT_BYTE) {
-                g(0x4000 | (r << 4) | v); /* LB Rr, 0, Rv */
+                g(0x0000 | (r << 4) | v); /* LB Rr, 0, Rv */
                 g(0);
             } else if ((ft & VT_BTYPE) == VT_DOUBLE || (ft & VT_BTYPE) == VT_LDOUBLE) {
-                g(0x5000 | (r << 4) | v); g(0);     /* L Rr, 0, Rv */
-                g(0x5000 | ((r+1) << 4) | v); g(1); /* L Rr+1, 1, Rv */
-                g(0x5000 | ((r+2) << 4) | v); g(2); /* L Rr+2, 2, Rv */
+                g(0x8000 | (r << 4) | v); g(0);     /* L Rr, 0, Rv */
+                g(0x8000 | ((r+1) << 4) | v); g(1); /* L Rr+1, 1, Rv */
+                g(0x8000 | ((r+2) << 4) | v); g(2); /* L Rr+2, 2, Rv */
             } else if ((ft & VT_BTYPE) == VT_FLOAT || (ft & VT_BTYPE) == VT_LONG || (ft & VT_BTYPE) == VT_LLONG) {
-                g(0x5000 | (r << 4) | v); g(0);     /* L Rr, 0, Rv */
-                g(0x5000 | ((r+1) << 4) | v); g(1); /* L Rr+1, 1, Rv */
+                g(0x8000 | (r << 4) | v); g(0);     /* L Rr, 0, Rv */
+                g(0x8000 | ((r+1) << 4) | v); g(1); /* L Rr+1, 1, Rv */
             } else {
-                g(0x5000 | (r << 4) | v); /* L Rr, 0, Rv */
+                g(0x8000 | (r << 4) | v); /* L Rr, 0, Rv */
                 g(0);
             }
         } else if (v == VT_CONST) {
@@ -217,17 +217,17 @@ void load(int r, SValue * sv)
                 greloc(cur_text_section, sv->sym, ind + 2, R_C60_32);
             }
             if ((ft & VT_BTYPE) == VT_BYTE) {
-                g(0x4000 | (r << 4) | 0); /* LB Rr, fc, R0 */
+                g(0x0000 | (r << 4) | 0); /* LB Rr, fc, R0 */
                 g(fc);
             } else if ((ft & VT_BTYPE) == VT_DOUBLE || (ft & VT_BTYPE) == VT_LDOUBLE) {
-                g(0x5000 | (r << 4) | 0); g(fc);     /* L Rr, fc, R0 */
-                g(0x5000 | ((r+1) << 4) | 0); g(fc+1); /* L Rr+1, fc+1, R0 */
-                g(0x5000 | ((r+2) << 4) | 0); g(fc+2); /* L Rr+2, fc+2, R0 */
+                g(0x8000 | (r << 4) | 0); g(fc);     /* L Rr, fc, R0 */
+                g(0x8000 | ((r+1) << 4) | 0); g(fc+1); /* L Rr+1, fc+1, R0 */
+                g(0x8000 | ((r+2) << 4) | 0); g(fc+2); /* L Rr+2, fc+2, R0 */
             } else if ((ft & VT_BTYPE) == VT_FLOAT || (ft & VT_BTYPE) == VT_LONG || (ft & VT_BTYPE) == VT_LLONG) {
-                g(0x5000 | (r << 4) | 0); g(fc);     /* L Rr, fc, R0 */
-                g(0x5000 | ((r+1) << 4) | 0); g(fc+1); /* L Rr+1, fc+1, R0 */
+                g(0x8000 | (r << 4) | 0); g(fc);     /* L Rr, fc, R0 */
+                g(0x8000 | ((r+1) << 4) | 0); g(fc+1); /* L Rr+1, fc+1, R0 */
             } else {
-                g(0x5000 | (r << 4) | 0); /* L Rr, fc, R0 */
+                g(0x8000 | (r << 4) | 0); /* L Rr, fc, R0 */
                 g(fc);
             }
         }
@@ -238,27 +238,27 @@ void load(int r, SValue * sv)
             }
             /* LI (Load Immediate) */
             if ((ft & VT_BTYPE) == VT_DOUBLE || (ft & VT_BTYPE) == VT_LDOUBLE) {
-                g(0x5F00 | (r << 4)); g(fc);
+                g(0x8400 | (r << 4)); g(fc);
                 g(0x5F00 | ((r+1) << 4)); g(sv->c.tab[1]);
                 g(0x5F00 | ((r+2) << 4)); g(sv->c.tab[2]);
             } else if ((ft & VT_BTYPE) == VT_FLOAT || (ft & VT_BTYPE) == VT_LONG || (ft & VT_BTYPE) == VT_LLONG) {
-                g(0x5F00 | (r << 4)); g(fc);
+                g(0x8400 | (r << 4)); g(fc);
                 g(0x5F00 | ((r+1) << 4)); g(sv->c.tab[1]);
             } else {
-                g(0x5F00 | (r << 4)); /* LI Rr, fc */
+                g(0x8400 | (r << 4)); /* LI Rr, fc */
                 g(fc);
             }
         } else if (v != r) {
             /* LR (Load Register) */
             if ((ft & VT_BTYPE) == VT_DOUBLE || (ft & VT_BTYPE) == VT_LDOUBLE) {
-                g(0x1800 | (r << 4) | v); /* LR Rr, Rv */
-                g(0x1800 | ((r+1) << 4) | (v+1));
-                g(0x1800 | ((r+2) << 4) | (v+2));
+                g(0x8100 | (r << 4) | v); /* LR Rr, Rv */
+                g(0x8100 | ((r+1) << 4) | (v+1));
+                g(0x8100 | ((r+2) << 4) | (v+2));
             } else if ((ft & VT_BTYPE) == VT_FLOAT || (ft & VT_BTYPE) == VT_LONG || (ft & VT_BTYPE) == VT_LLONG) {
-                g(0x1800 | (r << 4) | v); /* LR Rr, Rv */
-                g(0x1800 | ((r+1) << 4) | (v+1));
+                g(0x8100 | (r << 4) | v); /* LR Rr, Rv */
+                g(0x8100 | ((r+1) << 4) | (v+1));
             } else {
-                g(0x1800 | (r << 4) | v); /* LR Rr, Rv */
+                g(0x8100 | (r << 4) | v); /* LR Rr, Rv */
             }
         }
     }
@@ -275,33 +275,33 @@ void store(int r, SValue * v)
     if (fr == VT_LOCAL) {
         /* Store to frame pointer + offset. R14 is FP */
         if ((ft & VT_BTYPE) == VT_BYTE) {
-            g(0x6000 | (r << 4) | 14); /* STB Rr, fc, R14 */
+            g(0x0800 | (r << 4) | 14); /* STB Rr, fc, R14 */
             g(fc);
         } else if ((ft & VT_BTYPE) == VT_DOUBLE || (ft & VT_BTYPE) == VT_LDOUBLE) {
-            g(0x7000 | (r << 4) | 14); g(fc);
-            g(0x7000 | ((r+1) << 4) | 14); g(fc+1);
-            g(0x7000 | ((r+2) << 4) | 14); g(fc+2);
+            g(0x7D00 | (r << 4) | 14); g(fc);
+            g(0x7D00 | ((r+1) << 4) | 14); g(fc+1);
+            g(0x7D00 | ((r+2) << 4) | 14); g(fc+2);
         } else if ((ft & VT_BTYPE) == VT_FLOAT || (ft & VT_BTYPE) == VT_LONG || (ft & VT_BTYPE) == VT_LLONG) {
-            g(0x7000 | (r << 4) | 14); g(fc);
-            g(0x7000 | ((r+1) << 4) | 14); g(fc+1);
+            g(0x7D00 | (r << 4) | 14); g(fc);
+            g(0x7D00 | ((r+1) << 4) | 14); g(fc+1);
         } else {
-            g(0x7000 | (r << 4) | 14); /* ST Rr, fc, R14 */
+            g(0x7D00 | (r << 4) | 14); /* ST Rr, fc, R14 */
             g(fc);
         }
     } else if (fr < VT_CONST) {
         /* indirect store */
         if ((ft & VT_BTYPE) == VT_BYTE) {
-            g(0x6000 | (r << 4) | fr); /* STB Rr, 0, Rfr */
+            g(0x0800 | (r << 4) | fr); /* STB Rr, 0, Rfr */
             g(0);
         } else if ((ft & VT_BTYPE) == VT_DOUBLE || (ft & VT_BTYPE) == VT_LDOUBLE) {
-            g(0x7000 | (r << 4) | fr); g(0);
-            g(0x7000 | ((r+1) << 4) | fr); g(1);
-            g(0x7000 | ((r+2) << 4) | fr); g(2);
+            g(0x7D00 | (r << 4) | fr); g(0);
+            g(0x7D00 | ((r+1) << 4) | fr); g(1);
+            g(0x7D00 | ((r+2) << 4) | fr); g(2);
         } else if ((ft & VT_BTYPE) == VT_FLOAT || (ft & VT_BTYPE) == VT_LONG || (ft & VT_BTYPE) == VT_LLONG) {
-            g(0x7000 | (r << 4) | fr); g(0);
-            g(0x7000 | ((r+1) << 4) | fr); g(1);
+            g(0x7D00 | (r << 4) | fr); g(0);
+            g(0x7D00 | ((r+1) << 4) | fr); g(1);
         } else {
-            g(0x7000 | (r << 4) | fr); /* ST Rr, 0, Rfr */
+            g(0x7D00 | (r << 4) | fr); /* ST Rr, 0, Rfr */
             g(0);
         }
     } else if (fr == VT_CONST) {
@@ -310,17 +310,17 @@ void store(int r, SValue * v)
             greloc(cur_text_section, v->sym, ind + 2, R_C60_32);
         }
         if ((ft & VT_BTYPE) == VT_BYTE) {
-            g(0x6000 | (r << 4) | 0); /* STB Rr, fc, R0 */
+            g(0x0800 | (r << 4) | 0); /* STB Rr, fc, R0 */
             g(fc);
         } else if ((ft & VT_BTYPE) == VT_DOUBLE || (ft & VT_BTYPE) == VT_LDOUBLE) {
-            g(0x7000 | (r << 4) | 0); g(fc);
-            g(0x7000 | ((r+1) << 4) | 0); g(fc+1);
-            g(0x7000 | ((r+2) << 4) | 0); g(fc+2);
+            g(0x7D00 | (r << 4) | 0); g(fc);
+            g(0x7D00 | ((r+1) << 4) | 0); g(fc+1);
+            g(0x7D00 | ((r+2) << 4) | 0); g(fc+2);
         } else if ((ft & VT_BTYPE) == VT_FLOAT || (ft & VT_BTYPE) == VT_LONG || (ft & VT_BTYPE) == VT_LLONG) {
-            g(0x7000 | (r << 4) | 0); g(fc);
-            g(0x7000 | ((r+1) << 4) | 0); g(fc+1);
+            g(0x7D00 | (r << 4) | 0); g(fc);
+            g(0x7D00 | ((r+1) << 4) | 0); g(fc+1);
         } else {
-            g(0x7000 | (r << 4) | 0); /* ST Rr, fc, R0 */
+            g(0x7D00 | (r << 4) | 0); /* ST Rr, fc, R0 */
             g(fc);
         }
     }
@@ -328,23 +328,35 @@ void store(int r, SValue * v)
 
 void gfunc_call(int nb_args)
 {
-    int i, r, arg_regs;
+    int i, r, arg_regs, sz;
+    int reg_idx = 0;
+    int stack_args = 0;
 
-    arg_regs = nb_args > MAX_REGS_ARGS ? MAX_REGS_ARGS : nb_args;
+    /* Compute how many argument registers we will consume */
+    arg_regs = 0;
+    for (i = 0; i < nb_args; i++) {
+        sz = type_size(&vtop[-i].type, &r);
+        if (arg_regs + sz <= MAX_REGS_ARGS) {
+            arg_regs += sz;
+        } else {
+            stack_args += sz;
+        }
+    }
 
-    /* Push arguments onto the stack (reverse order usually, but TCC evaluates LTR and pushes RTL) */
-    /* Wait, TCC evaluates them and they are on the vstack. We pop from vtop. */
-    /* Thus we iterate from last to first argument. */
+    reg_idx = arg_regs; /* points past the last used reg */
 
     for (i = 0; i < nb_args; i++) {
-        if (i < arg_regs) {
-            /* Argument goes in register, load it to corresponding reg */
-            r = gv(1 << func_args_regs[arg_regs - 1 - i]);
-        } else {
+        sz = type_size(&vtop->type, &r);
+        if (stack_args > 0) {
             /* Argument goes on stack */
             r = gv(RC_INT);
             /* PSHM Rr, R15 */
-            g(0x1100 | (r << 4) | 15);
+            g(0x8F00 | (r << 4) | 15);
+            stack_args -= sz;
+        } else {
+            /* Argument goes in register */
+            reg_idx -= sz;
+            r = gv(1 << func_args_regs[reg_idx]);
         }
         vtop--;
     }
@@ -353,22 +365,32 @@ void gfunc_call(int nb_args)
         if (vtop->r & VT_SYM) {
             /* JC (Jump to Subroutine) */
             greloc(cur_text_section, vtop->sym, ind + 2, R_C60_32);
-            g(0x4C00); /* SJS */
+            g(0x7E00); /* SJS */
             g(0);
         }
     } else {
         r = gv(RC_INT);
         /* Jump to Subroutine Register */
-        g(0x1C00 | (r << 4)); /* SJS (indirect) via reg */
+        g(0x7E00 | (r << 4)); /* SJS (indirect) via reg */
     }
 
     vtop--;
 
-    if (nb_args > MAX_REGS_ARGS) {
-        int stack_args = nb_args - MAX_REGS_ARGS;
+    /* Restore stack space for pushed arguments */
+    stack_args = 0;
+    for (i = 0; i < nb_args; i++) {
+        sz = type_size(&vtop[i+1].type, &r);
+        if (arg_regs + sz > MAX_REGS_ARGS) {
+            stack_args += sz;
+        } else {
+            arg_regs += sz;
+        }
+    }
+
+    if (stack_args > 0) {
         /* adjust stack pointer */
         /* AIS R15, stack_args */
-        g(0x1600 | (15 << 4) | stack_args);
+        g(0xA000 | (15 << 4) | stack_args);
     }
 }
 
@@ -388,39 +410,39 @@ void gfunc_prolog(Sym *func_sym)
     while ((sym = sym->next) != NULL) {
         type = &sym->type;
         size = type_size(type, &align);
-        if (i < MAX_REGS_ARGS) {
+        if (i + size <= MAX_REGS_ARGS) {
             /* Parameter is passed in register */
             /* In a real implementation we would save it to the stack frame or map it properly */
             sym->r = VT_LOCAL | VT_LVAL;
             sym->c = loc;
             /* PSHM R_param, R15 */
-            g(0x1100 | (func_args_regs[i] << 4) | 15);
+            g(0x9F00 | (func_args_regs[i] << 4) | 15); /* PSHM is 0x9F00 */
             loc -= size;
+            i += size;
         } else {
             /* Parameter is passed on stack */
             sym->r = VT_LOCAL | VT_LVAL;
             sym->c = addr + 4; /* offset for old fp and ret addr */
             addr += size;
         }
-        i++;
     }
 
     func_ret_sub = 0;
 
     /* save frame pointer (R14) */
-    g(0x1100 | (14 << 4) | 15); /* PSHM R14, R15 */
+    g(0x8F00 | (14 << 4) | 15); /* PSHM R14, R15 */
     /* set new frame pointer */
-    g(0x1800 | (14 << 4) | 15); /* LR R14, R15 */
+    g(0x8100 | (14 << 4) | 15); /* LR R14, R15 */
 }
 
 void gfunc_epilog(void)
 {
     /* restore frame pointer */
-    g(0x1800 | (15 << 4) | 14); /* LR R15, R14 */
+    g(0x8100 | (15 << 4) | 14); /* LR R15, R14 */
     /* POPM R14, R15 */
-    g(0x1200 | (14 << 4) | 15);
+    g(0x8800 | (14 << 4) | 15);
     /* URS (Unstack Return Subroutine) */
-    g(0x1D00 | 15);
+    g(0x7F00 | 15);
 }
 
 int gjmp(int t)
@@ -428,16 +450,16 @@ int gjmp(int t)
     int ind1 = ind;
     if (nocode_wanted)
         return t;
-    /* B (Branch unconditionally) */
-    g(0x4000);
+    /* JC 0 (Branch unconditionally) */
+    g(0x7000);
     g(t);
     return ind1;
 }
 
 void gjmp_addr(int a)
 {
-    /* B (Branch unconditionally) */
-    g(0x4000);
+    /* JC 0 (Branch unconditionally) */
+    g(0x7000);
     g(a);
 }
 
@@ -448,6 +470,15 @@ ST_FUNC int gjmp_cond(int op, int t)
         return t;
 
     /* 1750A Branch conditions */
+    /* JC condition is in the RA field, which is bits 4-7 of the instruction (where MSB is bit 0).
+       In integer value, this corresponds to shifting by 8 for bits 8-11 if bit 15 is LSB.
+       Let's check the manual: Opcode (bits 0-7) is 0x70, Cond (bits 8-11) is cond << 4.
+       Because 0x7000 has 0x70 in the upper byte. The condition goes into the next nibble.
+       So cond << 8. Wait! 1750A instruction: Opcode(8 bits), RA(4 bits), RB(4 bits).
+       0x70 is Opcode (Jump Conditional). Cond is RA. RB is Index.
+       So Opcode is top 8 bits (0xFF00), RA is next 4 bits (0x00F0), RB is bottom 4 bits (0x000F).
+       So cond should be shifted by 4 (cond << 4)!
+    */
     int cond = 0;
     switch(op) {
         case TOK_EQ: cond = 0x8; break; /* BEZ */
@@ -459,7 +490,7 @@ ST_FUNC int gjmp_cond(int op, int t)
         default: cond = 0x0; break; /* NOP/Unconditional */
     }
 
-    g(0x4000 | (cond << 8));
+    g(0x7000 | (cond << 4)); /* JC cond, addr */
     g(t);
 
     return ind1;
@@ -483,49 +514,60 @@ void gen_opi(int op)
 {
     int r, fr, opc;
 
-    gv2(RC_INT, RC_INT);
+    /* For multiplication, division, and modulo, 1750A uses a double register (R, R+1). */
+    /* We must allocate a register pair, just like floats, so R+1 doesn't silently clobber another variable. */
+    if (op == '*' || op == '/' || op == '%' || op == TOK_UMOD) {
+        gv2(RC_INT, RC_FLOAT_PAIR); /* Force dest to be a paired reg */
+    } else {
+        gv2(RC_INT, RC_INT);
+    }
+
     r = vtop[-1].r;
     fr = vtop[0].r;
     vtop--;
 
     switch(op) {
         case '+':
-            g(0x1A00 | (r << 4) | fr); /* A Rr, Rfr */
+            g(0xA100 | (r << 4) | fr); /* A Rr, Rfr */
             break;
         case '-':
-            g(0x1B00 | (r << 4) | fr); /* S Rr, Rfr */
+            g(0xB100 | (r << 4) | fr); /* S Rr, Rfr */
             break;
         case '*':
-            g(0x1C00 | (r << 4) | fr); /* M Rr, Rfr */
+            g(0xC500 | (r << 4) | fr); /* MR Rr, Rfr */
             break;
         case '/':
-            /* Divide 32-bit (R, R+1) by 16-bit (fr). Quotient in R, Remainder in R+1. */
-            g(0x1D00 | (r << 4) | fr); /* D Rr, Rfr */
+            /* sign-extend 16-bit dividend (in r) to 32-bit into r, r+1 */
+            /* for now we assume unsigned or simple padding. Ideally `SOJ` or similar arithmetic shifts are used to set up r+1 */
+            /* For 1750A division DVR r, fr -> r is quotient, r+1 is remainder */
+            g(0x8100 | ((r + 1) << 4) | r); /* LR r+1, r (temp copy) */
+            /* In a full implementation, we sign-extend. For now, 0 out the top word (r) and put value in r+1? No, dividend is in R, R+1 */
+            g(0xD100 | (r << 4) | fr); /* DVR Rr, Rfr */
             break;
         case '%':
         case TOK_UMOD:
             /* Divide 32-bit (R, R+1) by 16-bit (fr). Quotient in R, Remainder in R+1. */
-            g(0x1D00 | (r << 4) | fr); /* D Rr, Rfr */
+            g(0xD100 | (r << 4) | fr); /* DVR Rr, Rfr */
             /* Move remainder to destination register */
-            g(0x1800 | (r << 4) | (r + 1)); /* LR R, R+1 */
+            g(0x8100 | (r << 4) | (r + 1)); /* LR R, R+1 */
             break;
         case '&':
-            g(0x1E00 | (r << 4) | fr); /* N Rr, Rfr (AND) */
+            g(0xE700 | (r << 4) | fr); /* N Rr, Rfr (AND) */
             break;
         case '|':
-            g(0x1F00 | (r << 4) | fr); /* O Rr, Rfr (OR) */
+            g(0xE100 | (r << 4) | fr); /* O Rr, Rfr (OR) */
             break;
         case '^':
-            g(0x2000 | (r << 4) | fr); /* X Rr, Rfr (XOR) */
+            g(0xE500 | (r << 4) | fr); /* X Rr, Rfr (XOR) */
             break;
         case TOK_SHL:
-            g(0x2100 | (r << 4) | fr); /* SLL Rr, Rfr */
+            g(0x6000 | (r << 4) | fr); /* SLL Rr, Rfr */
             break;
         case TOK_SHR:
-            g(0x2200 | (r << 4) | fr); /* SRL Rr, Rfr */
+            g(0x6100 | (r << 4) | fr); /* SRL Rr, Rfr */
             break;
         case TOK_SAR:
-            g(0x2300 | (r << 4) | fr); /* SRA Rr, Rfr */
+            g(0x6200 | (r << 4) | fr); /* SRA Rr, Rfr */
             break;
         case TOK_EQ:
         case TOK_NE:
@@ -533,7 +575,7 @@ void gen_opi(int op)
         case TOK_GE:
         case TOK_GT:
         case TOK_LE:
-            g(0x1900 | (r << 4) | fr); /* C Rr, Rfr (Compare) */
+            g(0xF100 | (r << 4) | fr); /* C Rr, Rfr (Compare) */
             vset_VT_CMP(op);
             break;
         default:
@@ -554,7 +596,7 @@ void gen_opf(int op)
 
     switch(op) {
         case '+':
-            g((is_double ? 0x8A00 : 0x8000) | (r << 4) | fr); /* FA/EFA */
+            g((is_double ? 0x8A00 : 0xA300) | (r << 4) | fr); /* FA/EFA */
             break;
         case '-':
             g((is_double ? 0x8B00 : 0x8100) | (r << 4) | fr); /* FS/EFS */
@@ -585,10 +627,10 @@ void gen_cvt_itof(int t)
     gv(RC_INT);
     r = vtop->r;
     if ((t & VT_BTYPE) == VT_FLOAT) {
-        g(0x8F00 | (r << 4) | r); /* FLT (Float) - Assuming Rr -> Rr */
+        g(0x8800 | (r << 4) | r); /* FLT (Float) - Assuming Rr -> Rr */
     } else {
         /* Double Float not directly single instruction, assuming EFLT */
-        g(0x9F00 | (r << 4) | r);
+        g(0x8F00 | (r << 4) | r);
     }
     vtop->type.t = t;
 }
@@ -599,9 +641,9 @@ void gen_cvt_ftoi(int t)
     gv(RC_FLOAT);
     r = vtop->r;
     if ((vtop->type.t & VT_BTYPE) == VT_FLOAT) {
-        g(0x8E00 | (r << 4) | r); /* FIX (Fix floating point) */
+        g(0x8800 | (r << 4) | r); /* FIX (Fix floating point) */
     } else {
-        g(0x9E00 | (r << 4) | r); /* EFIX */
+        g(0x8900 | (r << 4) | r); /* EFIX */
     }
     vtop->type.t = t;
 }
@@ -614,10 +656,10 @@ void gen_cvt_ftof(int t)
     if ((vtop->type.t & VT_BTYPE) == VT_FLOAT && ((t & VT_BTYPE) == VT_DOUBLE || (t & VT_BTYPE) == VT_LDOUBLE)) {
         /* Convert Float to Double (pad with 0s conceptually, but typically not natively single-instruction) */
         /* Placeholder for actual sequence or library call if 1750A lacks native F->D */
-        g(0x1800 | (r << 4) | r); /* LR (dummy) */
+        g(0x8100 | (r << 4) | r); /* LR (dummy) */
     } else if (((vtop->type.t & VT_BTYPE) == VT_DOUBLE || (vtop->type.t & VT_BTYPE) == VT_LDOUBLE) && (t & VT_BTYPE) == VT_FLOAT) {
         /* Convert Double to Float */
-        g(0x1800 | (r << 4) | r); /* LR (dummy) */
+        g(0x8100 | (r << 4) | r); /* LR (dummy) */
     }
     vtop->type.t = t;
 }
@@ -631,19 +673,19 @@ void gcall_or_jmp(int is_jmp)
             /* jump with relocation */
             greloc(cur_text_section, vtop->sym, ind + 2, R_C60_32);
             if (is_jmp) {
-                g(0x4000); /* B */
+                g(0x7000); /* JC 0 (Unconditional) */
                 g(0);
             } else {
-                g(0x4C00); /* SJS */
+                g(0x7E00); /* SJS */
                 g(0);
             }
         }
     } else {
         r = gv(RC_INT);
         if (is_jmp) {
-            g(0x1D00 | (r << 4)); /* B via reg */
+            g(0x7400 | (r << 4)); /* BR via reg */
         } else {
-            g(0x1C00 | (r << 4)); /* SJS via reg */
+            g(0x7E00 | (r << 4)); /* SJS via reg */
         }
     }
 }
@@ -673,7 +715,7 @@ ST_FUNC void gen_vla_alloc(CType *type, int align) {
     r = gv(RC_INT);
     /* Subtract the size from SP */
     /* S R15, r */
-    g(0x1B00 | (15 << 4) | r);
+    g(0xB100 | (15 << 4) | r);
     /* Align SP if needed. Usually SP must be aligned to 1 word for 1750a so no big alignment instructions needed. */
     vtop--;
     vset(&int_type, VT_LOCAL | VT_LVAL, 0);

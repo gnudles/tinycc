@@ -55,14 +55,14 @@ ST_FUNC void asm_instr(void)
             int r1 = parse_reg();
             if (tok == ',') next();
             int r2 = parse_reg();
-            g(0x1A00 | (r1 << 4) | r2);
+            g(0xA100 | (r1 << 4) | r2);
             break;
         }
         case TOK_ASM_s: {
             int r1 = parse_reg();
             if (tok == ',') next();
             int r2 = parse_reg();
-            g(0x1B00 | (r1 << 4) | r2);
+            g(0xB100 | (r1 << 4) | r2);
             break;
         }
         case TOK_ASM_l: {
@@ -95,8 +95,8 @@ ST_FUNC void asm_instr(void)
             g(val);
             break;
         }
-        case TOK_ASM_b: {
-            /* B Addr */
+        case TOK_ASM_br: {
+            /* BR Addr */
             int val = 0;
             if (tok == TOK_CINT) {
                 val = tokc.i;
@@ -104,7 +104,42 @@ ST_FUNC void asm_instr(void)
             } else {
                 expect("address/integer constant");
             }
-            g(0x4000);
+            g(0x7400);
+            g(val);
+            break;
+        }
+        case TOK_ASM_jc: {
+            /* JC cond, Addr */
+            int cond = 0, val = 0;
+            if (tok == TOK_CINT) {
+                cond = tokc.i;
+                next();
+            } else {
+                expect("condition constant");
+            }
+            if (tok == ',') next();
+            if (tok == TOK_CINT) {
+                val = tokc.i;
+                next();
+            } else {
+                expect("address/integer constant");
+            }
+            g(0x7000 | (cond << 4));
+            g(val);
+            break;
+        }
+        case TOK_ASM_soj: {
+            /* SOJ R, Addr */
+            int reg = parse_reg();
+            int val = 0;
+            if (tok == ',') next();
+            if (tok == TOK_CINT) {
+                val = tokc.i;
+                next();
+            } else {
+                expect("address/integer constant");
+            }
+            g(0x7300 | (reg << 4));
             g(val);
             break;
         }
@@ -117,13 +152,13 @@ ST_FUNC void asm_instr(void)
             } else {
                 expect("address/integer constant");
             }
-            g(0x4C00);
+            g(0x7E00);
             g(val);
             break;
         }
         case TOK_ASM_urs: {
             int reg = parse_reg();
-            g(0x1D00 | reg);
+            g(0xD100 | reg);
             break;
         }
         default:
