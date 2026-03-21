@@ -996,9 +996,18 @@ LIBTCCAPI int tcc_set_output_type(TCCState *s, int output_type)
 
     if (output_type == TCC_OUTPUT_OBJ) {
         /* always elf for objects */
+#ifdef TCC_TARGET_1750A
+        s->output_format = TCC_OUTPUT_FORMAT_COFF;
+#else
         s->output_format = TCC_OUTPUT_FORMAT_ELF;
+#endif
         return 0;
     }
+
+#ifdef TCC_TARGET_1750A
+    /* 1750A exclusively outputs COFF */
+    s->output_format = TCC_OUTPUT_FORMAT_COFF;
+#endif
 
     if (!s->nostdlib_paths)
         tcc_add_library_path(s, CONFIG_TCC_LIBPATHS);

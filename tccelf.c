@@ -3136,12 +3136,31 @@ LIBTCCAPI int tcc_output_file(TCCState *s, const char *filename)
     s->nb_errors = 0;
     if (s->test_coverage)
         tcc_tcov_add_file(s, filename);
-    if (s->output_type == TCC_OUTPUT_OBJ)
+    if (s->output_type == TCC_OUTPUT_OBJ) {
+#ifdef TCC_TARGET_COFF
+        if (s->output_format == TCC_OUTPUT_FORMAT_COFF) {
+            FILE *f = fopen(filename, "wb");
+            if (!f) return -1;
+            int ret = tcc_output_coff(s, f);
+            fclose(f);
+            return ret;
+        }
+#endif
         return elf_output_obj(s, filename);
+    }
 #ifdef TCC_TARGET_PE
     return  pe_output_file(s, filename);
 #elif defined TCC_TARGET_MACHO
     return macho_output_file(s, filename);
+#elif defined TCC_TARGET_COFF
+    if (s->output_format == TCC_OUTPUT_FORMAT_COFF) {
+        FILE *f = fopen(filename, "wb");
+        if (!f) return -1;
+        int ret = tcc_output_coff(s, f);
+        fclose(f);
+        return ret;
+    }
+    return elf_output_file(s, filename);
 #else
     return elf_output_file(s, filename);
 #endif
