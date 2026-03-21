@@ -1,0 +1,60 @@
+# MIL-STD-1750A Architecture Support for TCC
+
+This branch of Tiny C Compiler adds support for the `mil-std-1750a` instruction set architecture.
+1750A is a 16-bit word-addressable big-endian architecture used primarily in aerospace and military systems.
+
+## Building the Cross Compiler
+
+To compile the cross-compiler for the 1750A architecture, you must enable cross-compilation during the configure phase and explicitly make the `1750a-tcc` target:
+
+```sh
+./configure --enable-cross
+make 1750a-tcc
+```
+
+This will build a binary named `1750a-tcc` in the root of the source directory.
+
+## Compiling Programs
+
+Because the 1750A is treated as a bare-metal embedded system, `tcc` does not attempt to link standard C runtimes (like `crt1.o` or `libc`). Therefore, your program must provide its own entry point, `_start`.
+
+### Example
+
+Create a file `test.c`:
+
+```c
+int main() {
+    return 42;
+}
+
+/* The linker expects a _start symbol to exist as the entry point */
+int _start() {
+    return main();
+}
+```
+
+Invoke the cross compiler to produce a 1750A COFF file:
+
+```sh
+./1750a-tcc test.c -o test.coff
+```
+
+If you wish to only emit object files, use the `-c` flag:
+
+```sh
+./1750a-tcc -c test.c -o test.o
+```
+
+## Architecture specifics
+
+- `char` is 16-bit (1 word)
+- `short` is 16-bit (1 word)
+- `int` is 16-bit (1 word)
+- `long` is 32-bit (2 words)
+- `float` is 32-bit (2 words)
+- `double` is 48-bit (3 words)
+- `long double` is 48-bit (3 words)
+- `long long` (64-bit) is disabled and aliased to 32-bits (2 words).
+- Pointers are 16-bit (1 word)
+
+Inline assembly for standard instructions (`li`, `lr`, `l`, `st`, `a`, `s`, `m`, `d`, `b`, `sjs`, `urs`) is supported. Floating point instructions like `fa`, `fs`, `fm`, `fd` are also usable in inline assembly syntax.

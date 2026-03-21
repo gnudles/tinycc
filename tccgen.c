@@ -617,7 +617,7 @@ ST_FUNC void greloca(Section *s, Sym *sym, unsigned long offset, int type,
     put_elf_reloca(symtab_section, s, offset, type, c, addend);
 }
 
-#if PTR_SIZE == 4
+#if PTR_SIZE == 4 || PTR_SIZE == 2 || PTR_SIZE == 1
 ST_FUNC void greloc(Section *s, Sym *sym, unsigned long offset, int type)
 {
     greloca(s, sym, offset, type, 0);
@@ -1501,7 +1501,26 @@ ST_FUNC int get_reg(int rc)
                 if ((p->r & VT_VALMASK) == r ||
                     p->r2 == r)
                     goto notfound;
+#ifdef TCC_TARGET_1750A
+                /* on 1750A if checking a float/double we must ensure adjacent registers are free too */
+                if (rc == RC_FLOAT_PAIR) {
+                    int sz = (vtop->type.t & VT_BTYPE) == VT_DOUBLE || (vtop->type.t & VT_BTYPE) == VT_LDOUBLE ? 3 : 2;
+                    int i;
+                    for (i = 1; i < sz; i++) {
+                        if ((p->r & VT_VALMASK) == (r + i) || p->r2 == (r + i))
+                            goto notfound;
+                    }
+                }
+#endif
             }
+#ifdef TCC_TARGET_1750A
+            /* Also make sure the adjacent regs themselves aren't out of bounds or taken by arguments */
+            if (rc == RC_FLOAT_PAIR) {
+                int sz = (vtop->type.t & VT_BTYPE) == VT_DOUBLE || (vtop->type.t & VT_BTYPE) == VT_LDOUBLE ? 3 : 2;
+                if (r + sz - 1 >= 14) /* R14 is FP, R15 is SP */
+                    goto notfound;
+            }
+#endif
             return r;
         }
     notfound: ;
@@ -1912,6 +1931,13 @@ ST_FUNC int gv(int rc)
         if (bt == VT_LDOUBLE && rc == RC_FLOAT)
           rc = RC_INT;
 #endif
+#ifdef TCC_TARGET_1750A
+        /* On 1750a we use multiple registers for float/double. */
+        /* To avoid clobbering, we allocate them to specific paired general registers. */
+        if (rc == RC_FLOAT) {
+             rc = RC_FLOAT_PAIR;
+        }
+#endif
         rc2 = RC2_TYPE(bt, rc);
 
         /* need to reload if:
@@ -2024,10 +2050,13 @@ ST_FUNC void gv2(int rc1, int rc2)
     }
 }
 
-#if PTR_SIZE == 4
+#if PTR_SIZE == 4 || PTR_SIZE == 2
 /* expand 64bit on stack in two ints */
 ST_FUNC void lexpand(void)
 {
+#if defined(TCC_TARGET_1750A)
+    /* Long long is 32-bit, so it doesn't need to expand into 2 32-bit halves */
+#else
     int u, v;
     u = vtop->type.t & (VT_DEFSIGN | VT_UNSIGNED);
     v = vtop->r & (VT_VALMASK | VT_LVAL);
@@ -2044,17 +2073,22 @@ ST_FUNC void lexpand(void)
         vtop[0].r2 = vtop[-1].r2 = VT_CONST;
     }
     vtop[0].type.t = vtop[-1].type.t = VT_INT | u;
+#endif
 }
 #endif
 
-#if PTR_SIZE == 4
+#if PTR_SIZE == 4 || PTR_SIZE == 2 || PTR_SIZE == 1
 /* build a long long from two ints */
 static void lbuild(int t)
 {
+#if defined(TCC_TARGET_1750A)
+    /* Since long long is just 32-bit (same as long) here, no separate 64-bit building is needed */
+#else
     gv2(RC_INT, RC_INT);
     vtop[-1].r2 = vtop[0].r;
     vtop[-1].type.t = t;
     vpop();
+#endif
 }
 #endif
 
@@ -2096,10 +2130,16 @@ static void gv_dup(void)
     vtop->r = r;
 }
 
-#if PTR_SIZE == 4
+static void gen_opic(int op);
+
+#if PTR_SIZE == 4 || PTR_SIZE == 2 || PTR_SIZE == 1
 /* generate CPU independent (unsigned) long long operations */
 static void gen_opl(int op)
 {
+#if defined(TCC_TARGET_1750A)
+    /* If this gets called for 32-bit long long, route back to 32-bit ops */
+    gen_opic(op);
+#else
     int t, a, b, op1, c, i;
     int func;
     unsigned short reg_iret = REG_IRET;
@@ -2330,6 +2370,7 @@ static void gen_opl(int op)
         gvtst_set(0, b);
         break;
     }
+#endif
 }
 #endif
 

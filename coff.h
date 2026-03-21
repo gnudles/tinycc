@@ -41,6 +41,7 @@ struct filehdr {
 #define FILHSZ  22                /* above rounds to align on 4 bytes which causes problems */
 
 #define COFF_C67_MAGIC 0x00c2
+#define COFF_1750A_MAGIC 0x1750
 
 /*------------------------------------------------------------------------*/
 /*  Macros to recognize magic numbers                                     */

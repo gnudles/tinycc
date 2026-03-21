@@ -1142,6 +1142,16 @@ static void tok_str_add2(TokenString *s, int t, CValue *cv)
         str[len++] = cv->tab[1];
         str[len++] = cv->tab[2];
         str[len++] = cv->tab[3];
+#elif LDOUBLE_SIZE == 4
+        str[len++] = cv->tab[0];
+#elif LDOUBLE_SIZE == 6
+        str[len++] = cv->tab[0];
+        str[len++] = cv->tab[1];
+        str[len++] = cv->tab[2];
+#elif LDOUBLE_SIZE == 3
+        str[len++] = cv->tab[0];
+        str[len++] = cv->tab[1];
+        str[len++] = cv->tab[2];
 #else
 #error add long double size support
 #endif
@@ -1225,6 +1235,12 @@ static inline void tok_get(int *t, const int **pp, CValue *cv)
         n = 3;
 #elif LDOUBLE_SIZE == 16
         n = 4;
+#elif LDOUBLE_SIZE == 4
+        n = 1;
+#elif LDOUBLE_SIZE == 6
+        n = 3;
+#elif LDOUBLE_SIZE == 3
+        n = 3;
 #else
 # error add long double size support
 #endif

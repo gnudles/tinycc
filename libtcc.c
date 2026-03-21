@@ -26,7 +26,9 @@
 #include "tccpp.c"
 #include "tccgen.c"
 #include "tccdbg.c"
+#ifndef TCC_TARGET_1750A
 #include "tccasm.c"
+#endif
 #include "tccelf.c"
 #include "tccrun.c"
 #ifdef TCC_TARGET_I386
@@ -53,6 +55,11 @@
 #include "riscv64-gen.c"
 #include "riscv64-link.c"
 #include "riscv64-asm.c"
+#elif defined(TCC_TARGET_1750A)
+#include "1750a-gen.c"
+#include "1750a-link.c"
+#include "1750a-asm.c"
+#include "tcccoff.c"
 #else
 #error unknown target
 #endif
@@ -989,9 +996,18 @@ LIBTCCAPI int tcc_set_output_type(TCCState *s, int output_type)
 
     if (output_type == TCC_OUTPUT_OBJ) {
         /* always elf for objects */
+#ifdef TCC_TARGET_1750A
+        s->output_format = TCC_OUTPUT_FORMAT_COFF;
+#else
         s->output_format = TCC_OUTPUT_FORMAT_ELF;
+#endif
         return 0;
     }
+
+#ifdef TCC_TARGET_1750A
+    /* 1750A exclusively outputs COFF */
+    s->output_format = TCC_OUTPUT_FORMAT_COFF;
+#endif
 
     if (!s->nostdlib_paths)
         tcc_add_library_path(s, CONFIG_TCC_LIBPATHS);

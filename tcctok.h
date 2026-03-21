@@ -428,3 +428,7 @@
 #if defined TCC_TARGET_RISCV64
 #include "riscv64-tok.h"
 #endif
+
+#if defined TCC_TARGET_1750A
+#include "1750a-tok.h"
+#endif
